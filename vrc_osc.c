@@ -5,6 +5,12 @@
 #include "vrc_osc.h"
 #include <windows.h>
 
+static size_t strlen_or_max(const char *s, size_t max_len) {
+    for(size_t i = 0; i < max_len; ++i) {
+        if(!s[i]) return i;
+    }
+    return max_len;
+}
 
 int osc_send_float(socket_destination sd, const char *path, float f) {
     int path_strlen = strlen(path);
@@ -110,15 +116,32 @@ void print_osc_data(void *data) {
     }
 }
 
-void osc_parse_message(void *data, osc_message *msg) {
+int osc_parse_message(void *data, osc_message *msg) {
     memset(msg, 0 ,sizeof(osc_message));
     char *path = data;
-    int path_len = ALIGN4(strlen(path) + 1);
-    strncpy(msg->path, path, OSC_PATH_LEN - 1);
+    if(path[0] != '/') {
+        // Not an OSC path
+        return -1;
+    }
+    size_t len = strlen_or_max(path, OSC_PATH_LEN);
+    if(len == OSC_PATH_LEN) {
+        fprintf(stderr, "OSC Path longer than %d characters!\n", OSC_PATH_LEN - 1);
+        return -1;
+    }
+    size_t path_len = ALIGN4(len + 1);
+    strncpy(msg->path, path, len);
     
     char *type = (path + path_len);
-    int type_strlen = strlen(type);
-    int type_len = ALIGN4(type_strlen + 1);
+    if(type[0] != ',') {
+        // Missing ',' thus not a valid OSC Type Tag String
+        return -1;
+    }
+    len = strlen_or_max(type, 3);
+    if(len == 3) {
+        // OSC Type Tag String too long, unless VRChat has changed something
+        return -1;
+    }
+    size_t type_len = ALIGN4(len + 1);
     
     void *blob = (type + type_len);
     uint32_t swap = _byteswap_ulong(*(uint32_t*)blob);
@@ -137,7 +160,12 @@ void osc_parse_message(void *data, osc_message *msg) {
         }
         case 's': {
             msg->type = OSC_STRING;
-            strncpy(msg->s, blob, OSC_STRING_LEN - 1);
+            len = strlen_or_max(blob, OSC_STRING_LEN);
+            if(len == OSC_STRING_LEN) {
+                fprintf(stderr, "OSC String longer than %d characters!\n", OSC_STRING_LEN - 1);
+                return -1;
+            }
+            strncpy(msg->s, blob, len);
             break;
         }
         case 'T': {
@@ -149,6 +177,7 @@ void osc_parse_message(void *data, osc_message *msg) {
             break;
         }
     }
+    return 0;
 }
 
 void print_osc_message(osc_message *msg) {

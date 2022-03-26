@@ -11,7 +11,6 @@
 
 #define ALIGN4(addr) (((addr) + 3) & (~3llu))
 
-
 typedef enum {
     OSC_NULL = 0,
     OSC_INT,
@@ -35,7 +34,7 @@ int osc_send_int(socket_destination sd, const char *path, int i);
 int osc_send_float(socket_destination sd, const char *path, float f);
 int osc_send_str(socket_destination sd, const char *path, const char *str);
 
-void osc_parse_message(void *data, osc_message *msg);
+int osc_parse_message(void *data, osc_message *msg);
 void print_osc_message(osc_message *msg);
 void print_osc_data(void *data);
 #endif

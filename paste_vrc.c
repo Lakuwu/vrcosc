@@ -32,7 +32,7 @@ int osc_main(SOCKET s) {
         if(recvfrom(s, recv, RECEIVE_BUFFER_LENGTH-1, 0, NULL, NULL) == SOCKET_ERROR) {
             return WSAGetLastError();
         }
-        osc_parse_message(recv, &msg);
+        if(osc_parse_message(recv, &msg)) continue;
         if(msg.type == OSC_TRUE && !strncmp(msg.path, parameter, OSC_STRING_LEN - 1)) {
             vrchat_paste();
         }
