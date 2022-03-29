@@ -10,6 +10,6 @@ shift
 goto argsloopstart
 :argsloopend
 
-gcc -std=c18 -pedantic -Wall -Wextra -o %a:.c=.exe% %args% vrc_osc.c socket_util.c windows_util.c config.c -lws2_32
+gcc -std=c18 -pedantic -Wall -Wextra -o %a:.c=.exe% %args% lib/vrc_osc.c lib/socket_util.c lib/windows_util.c lib/config.c -lws2_32
 
 :end

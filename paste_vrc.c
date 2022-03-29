@@ -2,8 +2,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "vrc_osc.h"
-#include "config.h"
+#include "lib/vrc_osc.h"
+#include "lib/config.h"
 
 #define RECEIVE_BUFFER_LENGTH 512
 
