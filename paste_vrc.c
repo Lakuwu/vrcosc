@@ -17,8 +17,9 @@ void vrchat_paste() {
     if(!hwnd) return;
     SetForegroundWindow(hwnd);
     press_ctrl_and('V');
+    // Wait for the keystrokes to be processed before returning focus
+    SendMessageTimeout(hwnd, WM_NULL, 0, 0, 0, 1000, NULL);
     SetForegroundWindow(curr_window);
-    return;
 }
 
 int osc_main(SOCKET s) {
