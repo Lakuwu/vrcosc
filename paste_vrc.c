@@ -15,11 +15,28 @@ void vrchat_paste() {
     if(!pid) return;
     HWND hwnd = find_hwnd(pid, "UnityWndClass");
     if(!hwnd) return;
-    SetForegroundWindow(hwnd);
-    press_ctrl_and('V');
-    // Wait for the keystrokes to be processed before returning focus
-    SendMessageTimeout(hwnd, WM_NULL, 0, 0, 0, 1000, NULL);
-    SetForegroundWindow(curr_window);
+    INPUT dummy = {.type = INPUT_KEYBOARD, .ki = {0}};
+    SendInput(1, &dummy, sizeof(INPUT));
+    if(SetForegroundWindow(hwnd)) {
+        press_ctrl_and('V');
+        // Wait for the keystrokes to be processed before returning focus
+        SendMessageTimeout(hwnd, WM_NULL, 0, 0, 0, 1000, NULL);
+        SetForegroundWindow(curr_window);
+    } else {
+        // If we don't get focus we can try "typing" with WM_CHAR messages
+        if(!OpenClipboard(NULL)) return;
+        HANDLE h = GetClipboardData(CF_TEXT);
+        if(h) {
+            char *s = GlobalLock(h);
+            if(s) {
+                while(*s) {
+                    SendMessage(hwnd, WM_CHAR, *s++, 0);
+                }
+                GlobalUnlock(h);
+            }
+        }
+        CloseClipboard();
+    }
 }
 
 int osc_main(SOCKET s) {
