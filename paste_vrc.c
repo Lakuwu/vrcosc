@@ -89,7 +89,7 @@ int main() {
     
     SOCKET s = INVALID_SOCKET;
     config_get_int(cfg, "listening_port", &port);
-    if(open_socket(&s, port, htonl(INADDR_ANY))) {
+    if(open_socket(&s, port, inet_addr("127.0.0.1"))) {
         exit_error("Failed to open socket.", WSAGetLastError());
     }
     
