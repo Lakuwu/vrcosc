@@ -15,7 +15,7 @@ void vrchat_paste() {
     if(!pid) return;
     HWND hwnd = find_hwnd(pid, "UnityWndClass");
     if(!hwnd) return;
-    INPUT dummy = {.type = INPUT_KEYBOARD, .ki = {0}};
+    INPUT dummy = {.type = INPUT_KEYBOARD, .ki = {.wVk = 255, .dwFlags = KEYEVENTF_KEYUP}};
     SendInput(1, &dummy, sizeof(INPUT));
     if(SetForegroundWindow(hwnd)) {
         press_ctrl_and('V');
