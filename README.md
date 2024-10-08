@@ -2,6 +2,8 @@
 A simple C library for interacting with VRChat through OSC and some programs utilizing it.
 
 # paste_vrc
+Note: This is obsolete since VRChat added a virtual keyboard with clipboard functionality!
+
 ![paste_vrc GIF](https://media.giphy.com/media/v4LZiPuIntIPDDhfxG/giphy.gif)
 
 Allows you to paste text into VRChat.
